@@ -15,3 +15,9 @@ This library provides support for [Vavr](http://www.vavr.io/).
 # Intellij import 
 * In `Preferences / Build, Execution, Deployment / Compiler / Annotations Processors`, enable `annotation processing`
 * Import: `File / New.. / Project from existing sources / Gradle / Gradle wrapper`
+
+# Supported structures
+* Option
+* List
+* Tuple0..8
+* Map

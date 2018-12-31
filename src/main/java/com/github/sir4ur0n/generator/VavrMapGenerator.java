@@ -1,25 +1,25 @@
-package com.sir4ur0n.generator;
+package com.github.sir4ur0n.generator;
 
 import static com.pholser.junit.quickcheck.internal.Ranges.Type.INTEGRAL;
 import static com.pholser.junit.quickcheck.internal.Ranges.checkRange;
 
 import com.google.auto.service.AutoService;
 import com.pholser.junit.quickcheck.generator.ComponentizedGenerator;
-import com.pholser.junit.quickcheck.generator.Distinct;
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.generator.Generator;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
-import io.vavr.collection.List;
+import io.vavr.Tuple;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
 
 @AutoService(Generator.class)
-public class VavrListGenerator extends ComponentizedGenerator<List> {
+public class VavrMapGenerator extends ComponentizedGenerator<Map> {
 
   private Size sizeRange;
-  private boolean distinct = false;
 
-  public VavrListGenerator() {
-    super(List.class);
+  public VavrMapGenerator() {
+    super(Map.class);
   }
 
   /**
@@ -38,26 +38,17 @@ public class VavrListGenerator extends ComponentizedGenerator<List> {
     checkRange(INTEGRAL, size.min(), size.max());
   }
 
-  /**
-   * Tells this generator to add elements which are distinct from each other.
-   *
-   * @param distinct Generated elements will be distinct if this param is
-   * not null
-   */
-  @SuppressWarnings("unused")
-  public void configure(Distinct distinct) {
-    this.distinct = distinct != null;
-  }
-
   @Override
-  public List<?> generate(SourceOfRandomness random, GenerationStatus status) {
-    List<?> list = List.fill(size(random), () -> componentGenerators().get(0).generate(random, status));
-    return distinct ? list.distinct() : list;
+  public Map<?, ?> generate(SourceOfRandomness random, GenerationStatus status) {
+    return HashMap.fill(size(random), () -> Tuple.of(
+        componentGenerators().get(0).generate(random, status),
+        componentGenerators().get(1).generate(random, status)
+    ));
   }
 
   @Override
   public int numberOfNeededComponents() {
-    return 1;
+    return 2;
   }
 
   private int size(SourceOfRandomness random) {

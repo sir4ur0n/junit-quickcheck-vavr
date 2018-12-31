@@ -1,4 +1,4 @@
-package com.sir4ur0n.generator;
+package com.github.sir4ur0n.generator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

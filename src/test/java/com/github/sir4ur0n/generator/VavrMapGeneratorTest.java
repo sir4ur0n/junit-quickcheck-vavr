@@ -1,4 +1,4 @@
-package com.sir4ur0n.generator;
+package com.github.sir4ur0n.generator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,7 +18,6 @@ public class VavrMapGeneratorTest {
       assertThat(tuple._2).isNotNull();
     });
     assertThat(map.size()).isLessThanOrEqualTo(100);
-    System.out.println(map);
   }
 
   @Property

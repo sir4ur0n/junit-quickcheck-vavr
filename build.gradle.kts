@@ -1,6 +1,40 @@
+import com.jfrog.bintray.gradle.BintrayExtension
+
+group = "com.github.sir4ur0n"
+version = "1.0"
+val githubUrl = "https://github.com/Sir4ur0n/junit-quickcheck-vavr"
+
 plugins {
     id("io.franzbecker.gradle-lombok") version ("1.14")
     java
+    `maven-publish`
+    `java-library`
+    id("com.jfrog.bintray") version "1.8.4"
+}
+
+bintray {
+    // Nullable because if the bintrayUpload task is not invoked, we don't care about the credentials
+    val bintrayRepo: String? by project
+    val bintrayUser: String? by project
+    val bintrayKey: String? by project
+    user = bintrayUser
+    key = bintrayKey
+    setPublications("mavenJava")
+    pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
+        repo = bintrayRepo
+        name = project.group.toString() + ":" + project.name
+        userOrg = bintrayUser
+        websiteUrl = githubUrl
+        githubRepo = "Sir4ur0n/junit-quickcheck-vavr"
+        vcsUrl = githubUrl
+        description = "JUnit QuickCheck generators for Vavr types"
+        setLabels("vavr", "junit-quickcheck", "test", "property-based test")
+        setLicenses("MIT")
+        desc = description
+        version(delegateClosureOf<BintrayExtension.VersionConfig> {
+            name = project.version.toString()
+        })
+    })
 }
 
 lombok {
@@ -8,11 +42,51 @@ lombok {
     sha256 = ""
 }
 
-group = "com.sir4ur0n"
-version = "1.0-SNAPSHOT"
-
 repositories {
-    mavenCentral()
+    jcenter()
+}
+
+task<Jar>("sourcesJar") {
+    from(sourceSets.main.get().allJava)
+    classifier = "sources"
+}
+
+task<Jar>("javadocJar") {
+    from(tasks.javadoc)
+    classifier = "javadoc"
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+            pom {
+                name.set("JUnit QuickCheck Vavr")
+                description.set("JUnit QuickCheck generators for Vavr")
+                url.set(githubUrl)
+                licenses {
+                    license {
+                        name.set("MIT")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("sir4ur0n")
+                        name.set("Julien Debon")
+                    }
+                }
+                scm {
+                    url.set(githubUrl)
+                }
+            }
+        }
+    }
+    repositories {
+        jcenter()
+    }
 }
 
 dependencies {

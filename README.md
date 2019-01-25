@@ -9,7 +9,7 @@ This library provides [JUnit QuickCheck](http://pholser.github.io/junit-quickche
 # Quickstart
 Gradle
 ```kotlin
-testCompile("com.sir4ur0n", "junit-quickcheck-vavr", "1.0")
+testImplementation("com.sir4ur0n", "junit-quickcheck-vavr", "1.0")
 ```
 Maven
 ```xml

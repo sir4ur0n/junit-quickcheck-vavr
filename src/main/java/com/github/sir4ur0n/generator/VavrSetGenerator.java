@@ -23,10 +23,10 @@ public class VavrSetGenerator extends ComponentizedGenerator<Set> {
 
   /**
    * <p>Tells this generator to add elements to the generated collection
-   * a number of times within a specified minimum and/or maximum, inclusive,
+   * a number of times within a specified maximum, inclusive,
    * chosen with uniform distribution.</p>
    *
-   * <p>Note that some kinds of collections disallow duplicates, so the
+   * <p>Note that some kinds of collections have a finite number of distinct elements, so the
    * number of elements added may not be equal to the collection's size
    *
    * @param size annotation that gives the size constraints

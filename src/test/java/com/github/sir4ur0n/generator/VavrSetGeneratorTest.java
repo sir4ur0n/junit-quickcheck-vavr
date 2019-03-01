@@ -18,9 +18,9 @@ public class VavrSetGeneratorTest {
   }
 
   @Property
-  public void withSizeConstraint(@Size(min = 18, max = 42) Set<String> strings) {
+  public void withMaxSizeConstraint(@Size(max = 42) Set<String> strings) {
     strings.forEach(string -> assertThat(string).isNotNull());
-    assertThat(strings.size()).isBetween(18, 42);
+    assertThat(strings.size()).isLessThanOrEqualTo(42);
   }
 
 }

@@ -2,6 +2,13 @@ package com.github.sir4ur0n.generator;
 
 import static com.pholser.junit.quickcheck.internal.Ranges.Type.INTEGRAL;
 import static com.pholser.junit.quickcheck.internal.Ranges.checkRange;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.List;
+import static io.vavr.API.Match;
+import static io.vavr.Patterns.$Cons;
+import static io.vavr.Patterns.$Nil;
+import static java.util.function.Function.identity;
 
 import com.google.auto.service.AutoService;
 import com.pholser.junit.quickcheck.generator.ComponentizedGenerator;
@@ -11,6 +18,9 @@ import com.pholser.junit.quickcheck.generator.Generator;
 import com.pholser.junit.quickcheck.generator.Size;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import io.vavr.collection.List;
+import io.vavr.collection.Stream;
+import java.math.BigDecimal;
+import java.util.function.Function;
 
 @AutoService(Generator.class)
 public class VavrListGenerator extends ComponentizedGenerator<List> {
@@ -65,4 +75,77 @@ public class VavrListGenerator extends ComponentizedGenerator<List> {
         ? random.nextInt(sizeRange.min(), sizeRange.max())
         : random.nextInt(0, 100);
   }
+
+  @Override
+  public boolean canShrink(Object larger) {
+    if (types().get(0).isInstance(larger)) {
+      List<?> list = (List) larger;
+      return list.nonEmpty();
+    }
+    return false;
+  }
+
+  /**
+   * Shrinking is based on <a href="http://hackage.haskell.org/package/QuickCheck-2.12.6.1/docs/src/Test.QuickCheck.Arbitrary.html#shrinkList">QuickCheck list implementation</a>.
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public java.util.List<List> doShrink(SourceOfRandomness random, List xs) {
+    int n = xs.length();
+    // Shrinker of list elements
+    Function shr = o -> ((Generator) componentGenerators().get(0)).doShrink(random, o);
+
+    // takeWhile (>0) (iterate (`div`2) n)
+    List<Integer> numberOfElementsToRemove = Stream.iterate(n, integer -> integer / 2)
+        .takeWhile(i -> i > 0)
+        .toList();
+
+    // [ removes k n xs | k <- takeWhile (>0) (iterate (`div`2) n) ]
+    return numberOfElementsToRemove.map(k -> removes(k, n, xs))
+        // concat [ removes k n xs | k <- takeWhile (>0) (iterate (`div`2) n) ]
+        .flatMap(identity())
+        // ++ shrinkOne xs
+        .appendAll(shrinkOne(xs, shr))
+        .toJavaList();
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<List> shrinkOne(List input, Function shr) {
+    return Match(input).of(
+        Case($Nil(), List::empty),
+        Case($Cons($(), $()), (x, xs) -> {
+          List shrunkX = List.ofAll((java.util.List) shr.apply(x));
+          List shrunkHead = shrunkX.map(o -> List(o).appendAll(xs));
+
+          List<List<Object>> shrunkXs = shrinkOne(xs, shr).map(shrunkTail -> List(x).appendAll(shrunkTail));
+
+          return shrunkHead.appendAll(shrunkXs);
+        })
+    );
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<List> removes(int k, int n, List xs) {
+    // k > n     = []
+    if (k > n) {
+      return List();
+    }
+
+    List xs1 = xs.take(k);
+    List xs2 = xs.drop(k);
+
+    // null xs2  = [[]]
+    if (xs2.isEmpty()) {
+      return List(List());
+    }
+
+    // otherwise = xs2 : map (xs1 ++) (removes k (n-k) xs2)
+    return List(xs2).appendAll(removes(k, (n - k), xs2).map(list -> list.prependAll(xs1)));
+  }
+
+  @Override
+  public BigDecimal magnitude(Object value) {
+    return BigDecimal.valueOf(((List) value).size());
+  }
+
 }

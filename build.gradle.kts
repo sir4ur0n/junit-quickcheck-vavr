@@ -93,7 +93,7 @@ dependencies {
     // Functional control and immutable data types for Java
     compile("io.vavr", "vavr", "0.9.2")
     // Property Based Test framework
-    val junitQuickcheck = "0.8.1"
+    val junitQuickcheck = "0.9-SNAPSHOT"
     compile("com.pholser", "junit-quickcheck-core", junitQuickcheck)
     compile("com.pholser", "junit-quickcheck-generators", junitQuickcheck)
     // Avoid maintaining the explicit resource file with all Quickcheck generators

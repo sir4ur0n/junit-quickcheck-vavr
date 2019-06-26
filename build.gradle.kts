@@ -1,7 +1,7 @@
 import com.jfrog.bintray.gradle.BintrayExtension
 
 group = "com.github.sir4ur0n"
-version = "1.0"
+version = "2.0"
 val githubUrl = "https://github.com/Sir4ur0n/junit-quickcheck-vavr"
 
 plugins {
@@ -93,7 +93,7 @@ dependencies {
     // Functional control and immutable data types for Java
     compile("io.vavr", "vavr", "0.9.2")
     // Property Based Test framework
-    val junitQuickcheck = "0.8.2"
+    val junitQuickcheck = "0.9"
     compile("com.pholser", "junit-quickcheck-core", junitQuickcheck)
     compile("com.pholser", "junit-quickcheck-generators", junitQuickcheck)
     // Avoid maintaining the explicit resource file with all Quickcheck generators
